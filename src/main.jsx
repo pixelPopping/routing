@@ -7,6 +7,7 @@ import { User } from "./User";
 import { Root } from "./Root";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
+import { PostList, loader as postListLoader } from "./PostList";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <PostList />,
+        loader: postListLoader,
       },
       {
         path: "/post/:postId",
