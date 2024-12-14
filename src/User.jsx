@@ -1,45 +1,49 @@
-// User.jsx
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 
 export const loader = async ({ params }) => {
-  const { userId } = params;
+  const user = await fetch(`http://localhost:3000/users/${params.userId}`);
+  const posts = await fetch(
+    `http://localhost:3000/posts?userId=${params.userId}`
+  );
+  const comments = await fetch(
+    `http://localhost:3000/comments?userId=${params.userId}`
+  );
 
-  // Fetch the user data
-  const userResponse = await fetch(`/api/users/${userId}`);
-  const user = await userResponse.json();
-
-  // Fetch the posts of the user
-  const postsResponse = await fetch(`/api/users/${userId}/posts`);
-  const posts = await postsResponse.json();
-
-  // Fetch the comments of the user
-  const commentsResponse = await fetch(`/api/users/${userId}/comments`);
-  const comments = await commentsResponse.json();
-
-  return { user, posts, comments };
+  return {
+    user: await user.json(),
+    posts: await posts.json(),
+    comments: await comments.json(),
+  };
 };
 
-const User = () => {
-  const { user, posts, comments } = useLoaderData();
+export const User = () => {
+  const { posts, comments, user } = useLoaderData();
 
   return (
-    <div>
+    <div className="user">
       <h1>{user.name}</h1>
-      <p>{user.email}</p>
-      <h2>Posts</h2>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
-      <h2>Comments</h2>
-      <ul>
-        {comments.map((comment) => (
-          <li key={comment.id}>{comment.body}</li>
-        ))}
-      </ul>
+
+      {posts.length > 0 && (
+        <>
+          <h2>Posts:</h2>
+          {posts.map((post) => (
+            <div key={post.id}>
+              <Link to={`/post/${post.id}`}>{post.title}</Link>
+            </div>
+          ))}
+        </>
+      )}
+
+      {comments.length > 0 && (
+        <>
+          <h2>Comments:</h2>
+          {comments.map((comment) => (
+            <div key={comment.id}>
+              <Link to={`/post/${comment.postId}`}>{comment.comment}</Link>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 };
-
-export default User;
